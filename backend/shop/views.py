@@ -29,12 +29,7 @@ def product_list(request, category_slug=None, format=None):
 
 
 @api_view(['GET'])
-def product_detail(request, pk, slug):
-    try:
-        product = get_object_or_404(Product, pk=pk, slug=slug, available=True)
-    except Product.DoesNotExist:
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    if request.method == 'GET' or 'get':
-        product_serializer = ProductSerializer(product, many=True)
-        return Response(product_serializer.data, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_404_NOT_FOUND)
+def product_detail(request, pk):
+    product = Category.objects.filter(pk=pk, available=True)
+    product_serializer = ProductSerializer(product, many=True)
+    return Response(product_serializer.data, status=status.HTTP_200_OK)
