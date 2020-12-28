@@ -4,7 +4,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 
 from .models import Category, Product
-# from .serializers import CategorySerializer, ProductSerializer
+from .serializers import CategorySerializer, ProductSerializer
 
 
 @api_view(['GET'])
@@ -12,14 +12,19 @@ def product_list(request, category_slug=None, format=None):
     if request.method == 'GET' or 'get':
         category = None
         categories = Category.objects.all()
+        category_serializer = CategorySerializer(categories, many=True)
         products = Product.objects.filter(available=True)
+        product_serializer = ProductSerializer(products, many=True)
 
         if category_slug:
             category = get_object_or_404(Category, slug=category_slug)
+            #category_serializer = CategorySerializer(category, many=True)
             products = products.filter(category=category)
-        return Response({
-            'category': category,
-            'categories': categories,
-            'products': products,
-            }, status=status.HTTP_200_OK)
+            product_serializer = ProductSerializer(products, many=True)
+        return Response({'products': product_serializer.data,
+                         'categories': category_serializer.data,
+                         }, status=status.HTTP_200_OK)
+
     return Response(status=status.HTTP_404_NOT_FOUND)
+
+
